@@ -1,0 +1,65 @@
+//1. 제일먼저 설정...-> 2. Application
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.7'  // 플러그인 버전 고정
+    id 'io.spring.dependency-management' version '1.1.7'  // 이 플러그인이 BOM 관리
+}
+
+group = 'hello'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// 이 부분 중복 제거: 플러그인이 자동으로 spring-boot-dependencies 3.5.7 BOM import
+// dependencyManagement { ... } 블록 전체 삭제!
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-mustache')
+    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
+
+    implementation('org.springframework.session:spring-session-jdbc')
+
+    //implementation("org.mariadb.jdbc:mariadb-java-client")
+    implementation('com.h2database:h2')
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' //spring data jpa 추상화 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-security' // 시큐리티 핵심
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6' // 타임리프에서 시큐리티 쓰기용
+
+    runtimeOnly 'com.mysql:mysql-connector-j:9.4.0'  // mysql-connector-java → mysql-connector-j (올바른 artifact)
+    //runtimeOnly 'com.h2database:h2' //인메모리 관계형 데이터베이스
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'junit:junit:4.13.2' // Use the latest version
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+test {
+    useJUnitPlatform() // <--- 이 설정이 있어야 JUnit 5 테스트를 인식합니다!
+}
+// build.gradle에 추가
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
+}
